@@ -1,66 +1,87 @@
+<!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
-    <title>Intro to FeatureLayer | Sample | ArcGIS API for JavaScript 4.24</title>
 
-    <link rel="stylesheet" href="https://js.arcgis.com/4.24/esri/themes/light/main.css" />
-    <script src="https://js.arcgis.com/4.24/"></script>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
+  <title>Legend widget - 4.6</title>
+  <link rel="stylesheet" href="https://js.arcgis.com/4.6/esri/css/main.css">
 
-    <style>
-      html,
-      body,
-      #viewDiv {
-        padding: 0;
-        margin: 0;
-        height: 100%;
-        width: 100%;
-      }
-    </style>
+  <style>
+    html,
+    body,
+    #viewDiv {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+    }
+  </style>
 
-    <script>
-      require(['esri/Map', 'esri/views/MapView', 'esri/layers/FeatureLayer'], (
-  Map,
-  MapView,
-  FeatureLayer
-) => {
-        const map = new Map({
-          basemap: 'gray-vector',
-          // "hybrid"
-        });
-
-        const view = new MapView({
-          container: 'viewDiv',
-          map,
-          center: [-75.15872541336486, 39.95954448848102],
-          zoom: 5,
-          //   extent: {
-          //     // autocasts as new Extent()
-          //     xmin: -9177811,
-          //     ymin: 4247000,
-          //     xmax: -9176791,
-          //     ymax: 4247784,
-          //     spatialReference: 102100,
-          //   },
-        });
-
-        /** ******************
-         * Add feature layer
-         ******************* */
-
-        // Carbon storage of trees in Warren Wilson College.
-        const featureLayer = new FeatureLayer({
-          url:
-      'https://services2.arcgis.com/FiaPA4ga0iQKduv3/arcgis/rest/services/State_Legislative_Districts_Upper_Houses_v1/FeatureServer',
-    // 'https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Landscape_Trees/FeatureServer/0',
-        });
-
-        map.add(featureLayer);
+  <script src="https://js.arcgis.com/4.6/"></script>
+  <script>
+    require([
+      'esri/views/MapView',
+      'esri/widgets/Legend',
+      'esri/WebMap',
+      'esri/core/watchUtils',
+      'dojo/query',
+      'dojo/aspect',
+      'dojo/domReady!',
+    ], function(MapView, Legend, WebMap, watchUtils, query, aspect) {
+  const webmap = new WebMap({
+        portalItem: {
+          // autocasts as new PortalItem()
+          id: '7307fb754a5542898a95a00f40b8199b',
+        },
       });
-    </script>
-  </head>
 
-  <body>
-    <div id="viewDiv"></div>
-  </body>
-</html>
+      const view = new MapView({
+        container: 'viewDiv',
+        map: webmap,
+      });
+
+      view.when(function() {
+        // get the first layer in the collection of operational layers in the WebMap
+        // when the resources in the MapView have loaded.
+        const featureLayer = webmap.layers.getItemAt(0);
+        const featureLayer2 = webmap.layers.getItemAt(1);
+
+        const legend = new Legend({
+          view,
+          layerInfos: [
+            {
+              layer: featureLayer,
+              title: 'NY Educational Attainment',
+            },
+            {
+              layer: featureLayer2,
+              title: '',
+            },
+          ],
+    });
+
+        watchUtils.when(legend, 'container', function() {
+          aspect.after(legend, 'scheduleRender', function(response) {
+            if (query('.esri-legend__layer-caption')[0]) {
+              query('.esri-legend__layer-caption')[0].style.display = 'none';
+            }
+            if (query('.esri-legend__layer-caption')[1]) {
+          query('.esri-legend__layer-caption')[1].style.display = 'none';
+            }
+          });
+        });
+
+        // Add widget to the bottom right corner of the view
+        view.ui.add(legend, 'bottom-right');
+      });
+    });
+  </script>
+</head>
+
+<body class="calcite">
+  <div id="viewDiv"></div>
+</body>
+
+</html>‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍
